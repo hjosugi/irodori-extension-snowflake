@@ -1,0 +1,163 @@
+{
+  "id": "snowflake.sql",
+  "name": "Snowflake SQL",
+  "aliases": [
+    "snowflake",
+    "snowsql",
+    "sfsql",
+    "Snowflake"
+  ],
+  "keywords": [
+    {
+      "word": "select",
+      "category": "keyword"
+    },
+    {
+      "word": "qualify",
+      "category": "keyword"
+    },
+    {
+      "word": "sample",
+      "category": "keyword"
+    },
+    {
+      "word": "tablesample",
+      "category": "keyword"
+    },
+    {
+      "word": "pivot",
+      "category": "keyword"
+    },
+    {
+      "word": "unpivot",
+      "category": "keyword"
+    },
+    {
+      "word": "match_recognize",
+      "category": "keyword"
+    },
+    {
+      "word": "merge",
+      "category": "keyword"
+    },
+    {
+      "word": "copy",
+      "category": "keyword"
+    },
+    {
+      "word": "stage",
+      "category": "keyword"
+    },
+    {
+      "word": "warehouse",
+      "category": "keyword"
+    },
+    {
+      "word": "task",
+      "category": "keyword"
+    },
+    {
+      "word": "stream",
+      "category": "keyword"
+    },
+    {
+      "word": "dynamic",
+      "category": "keyword"
+    },
+    {
+      "word": "semantic",
+      "category": "keyword"
+    },
+    {
+      "word": "time",
+      "category": "keyword"
+    },
+    {
+      "word": "travel",
+      "category": "keyword"
+    },
+    {
+      "word": "changes",
+      "category": "keyword"
+    },
+    {
+      "word": "flatten",
+      "category": "function"
+    },
+    {
+      "word": "try_cast",
+      "category": "function"
+    },
+    {
+      "word": "result_scan",
+      "category": "function"
+    },
+    {
+      "word": "get_query_operator_stats",
+      "category": "function"
+    },
+    {
+      "word": "query_history",
+      "category": "function"
+    },
+    {
+      "word": "warehouse_load_history",
+      "category": "function"
+    },
+    {
+      "word": "warehouse_metering_history",
+      "category": "function"
+    },
+    {
+      "word": "snowflake.cortex.complete",
+      "category": "function"
+    },
+    {
+      "word": "snowflake.cortex.summarize",
+      "category": "function"
+    },
+    {
+      "word": "snowflake.cortex.sentiment",
+      "category": "function"
+    },
+    {
+      "word": "system$task_dependents_enable",
+      "category": "procedure"
+    }
+  ],
+  "snippets": [
+    {
+      "label": "sf context",
+      "insertText": "SELECT CURRENT_ACCOUNT() AS account, CURRENT_REGION() AS region, CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse, CURRENT_DATABASE() AS database, CURRENT_SCHEMA() AS schema;",
+      "detail": "Show Snowflake session context."
+    },
+    {
+      "label": "sf query history",
+      "insertText": "SELECT query_id, user_name, warehouse_name, execution_status, total_elapsed_time, bytes_scanned, rows_produced, query_text\nFROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY(END_TIME_RANGE_START => DATEADD('hour', -1, CURRENT_TIMESTAMP()), RESULT_LIMIT => 100))\nORDER BY start_time DESC;",
+      "detail": "Recent query history from INFORMATION_SCHEMA."
+    },
+    {
+      "label": "sf query profile",
+      "insertText": "SELECT *\nFROM TABLE(GET_QUERY_OPERATOR_STATS('<query_id>'))\nORDER BY step_id, operator_id;",
+      "detail": "Operator-level query profile for one query id."
+    },
+    {
+      "label": "sf copy validate",
+      "insertText": "COPY INTO <table_name>\nFROM @<stage_name>\nFILE_FORMAT = (FORMAT_NAME = '<file_format>')\nVALIDATION_MODE = RETURN_ERRORS;",
+      "detail": "Validate staged files before loading."
+    },
+    {
+      "label": "sf cortex complete",
+      "insertText": "SELECT SNOWFLAKE.CORTEX.COMPLETE('claude-3-5-sonnet', '<prompt>') AS response;",
+      "detail": "Run a Cortex AISQL completion."
+    }
+  ],
+  "formatter": {
+    "keywordCase": "upper",
+    "identifierQuote": "\"",
+    "provider": "sql-dialect-fmt",
+    "command": "sql_format_snowflake",
+    "lineWidth": 100,
+    "indentWidth": 4
+  }
+}
