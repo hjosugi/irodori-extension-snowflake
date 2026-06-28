@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "visibility": "public",
+  "extensionId": "irodori.snowflake",
+  "connector": {
+    "id": "snowflake.connector",
+    "engine": "snowflake",
+    "label": "Snowflake",
+    "aliases": [
+      "snowflake",
+      "Snowflake"
+    ],
+    "defaultPort": 443,
+    "wire": "snowflake",
+    "module": "snowflake.driver",
+    "features": [
+      "metadata",
+      "sql",
+      "streaming",
+      "explain"
+    ]
+  },
+  "runtime": {
+    "abi": "irodori.connector.native.v1",
+    "module": {
+      "id": "snowflake.driver",
+      "path": "dist/native",
+      "platforms": [
+        "windowsX64",
+        "windowsArm64",
+        "macosX64",
+        "macosArm64",
+        "linuxX64",
+        "linuxArm64"
+      ]
+    },
+    "crate": "irodori_extension_snowflake",
+    "entrypoints": [
+      "irodori_extension_abi_version",
+      "irodori_connector_engine_json",
+      "irodori_extension_manifest_json",
+      "irodori_connector_config_json",
+      "irodori_connector_call_json",
+      "irodori_connector_free_buffer"
+    ],
+    "supportedCalls": [
+      "health",
+      "describe",
+      "manifest",
+      "config"
+    ],
+    "driverLinked": false
+  },
+  "source": {
+    "marketplaceId": "irodori.snowflake",
+    "repository": "https://github.com/hjosugi/irodori-extension-snowflake",
+    "knowledgeEngineStatus": "wired",
+    "adapter": "db/snowflake.rs",
+    "adapterSha256": "cb9c693f090832d6d91b4dca176495e446ff7b436247d71692539e27f6493a5c"
+  }
+}
