@@ -1,0 +1,823 @@
+{
+  "schemaVersion": 1,
+  "extensionId": "irodori.snowflake",
+  "visibility": "public",
+  "version": "0.1.0",
+  "connector": {
+    "id": "snowflake.connector",
+    "engine": "snowflake",
+    "label": "Snowflake",
+    "aliases": [
+      "snowflake",
+      "Snowflake"
+    ],
+    "defaultPort": 443,
+    "wire": "snowflake",
+    "module": "snowflake.driver",
+    "features": [
+      "metadata",
+      "sql",
+      "streaming",
+      "explain",
+      "warehouse",
+      "queryHistory",
+      "queryProfile",
+      "workloadMonitoring",
+      "dataLoading",
+      "dataEngineering",
+      "semanticLayer",
+      "aiSql",
+      "sqlFormatting",
+      "queryTemplates",
+      "visualization"
+    ]
+  },
+  "connection": {
+    "endpoint": {
+      "modes": [
+        "hostPort",
+        "connectionString"
+      ],
+      "defaultPort": 443,
+      "fields": [
+        {
+          "id": "host",
+          "label": "Host",
+          "type": "string",
+          "profileField": "host",
+          "required": true
+        },
+        {
+          "id": "port",
+          "label": "Port",
+          "type": "number",
+          "profileField": "port",
+          "default": 443
+        },
+        {
+          "id": "database",
+          "label": "Database",
+          "type": "string",
+          "profileField": "database"
+        }
+      ]
+    },
+    "authMethods": [
+      "none",
+      "connectionString",
+      "userPassword",
+      "snowflakeKeyPair",
+      "oauth2",
+      "snowflakeSessionToken",
+      "browserSso",
+      "saml",
+      "externalBrowser",
+      "customDriverOptions"
+    ],
+    "tls": "required",
+    "transports": "default",
+    "optionNamespaces": [
+      "snowflake"
+    ],
+    "customDriverOptions": true
+  },
+  "runtime": {
+    "driverLinked": false
+  },
+  "source": {
+    "knowledgeEngineStatus": "wired",
+    "adapter": "db/snowflake.rs"
+  },
+  "dialect": {
+    "id": "snowflake.sql",
+    "name": "Snowflake SQL",
+    "aliases": [
+      "snowflake",
+      "snowsql",
+      "sfsql",
+      "Snowflake"
+    ],
+    "keywords": [
+      {
+        "word": "select",
+        "category": "keyword"
+      },
+      {
+        "word": "qualify",
+        "category": "keyword"
+      },
+      {
+        "word": "sample",
+        "category": "keyword"
+      },
+      {
+        "word": "tablesample",
+        "category": "keyword"
+      },
+      {
+        "word": "pivot",
+        "category": "keyword"
+      },
+      {
+        "word": "unpivot",
+        "category": "keyword"
+      },
+      {
+        "word": "match_recognize",
+        "category": "keyword"
+      },
+      {
+        "word": "merge",
+        "category": "keyword"
+      },
+      {
+        "word": "copy",
+        "category": "keyword"
+      },
+      {
+        "word": "stage",
+        "category": "keyword"
+      },
+      {
+        "word": "warehouse",
+        "category": "keyword"
+      },
+      {
+        "word": "task",
+        "category": "keyword"
+      },
+      {
+        "word": "stream",
+        "category": "keyword"
+      },
+      {
+        "word": "dynamic",
+        "category": "keyword"
+      },
+      {
+        "word": "semantic",
+        "category": "keyword"
+      },
+      {
+        "word": "time",
+        "category": "keyword"
+      },
+      {
+        "word": "travel",
+        "category": "keyword"
+      },
+      {
+        "word": "changes",
+        "category": "keyword"
+      },
+      {
+        "word": "flatten",
+        "category": "function"
+      },
+      {
+        "word": "try_cast",
+        "category": "function"
+      },
+      {
+        "word": "result_scan",
+        "category": "function"
+      },
+      {
+        "word": "get_query_operator_stats",
+        "category": "function"
+      },
+      {
+        "word": "query_history",
+        "category": "function"
+      },
+      {
+        "word": "warehouse_load_history",
+        "category": "function"
+      },
+      {
+        "word": "warehouse_metering_history",
+        "category": "function"
+      },
+      {
+        "word": "snowflake.cortex.complete",
+        "category": "function"
+      },
+      {
+        "word": "snowflake.cortex.summarize",
+        "category": "function"
+      },
+      {
+        "word": "snowflake.cortex.sentiment",
+        "category": "function"
+      },
+      {
+        "word": "system$task_dependents_enable",
+        "category": "procedure"
+      }
+    ],
+    "snippets": [
+      {
+        "label": "sf context",
+        "insertText": "SELECT CURRENT_ACCOUNT() AS account, CURRENT_REGION() AS region, CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse, CURRENT_DATABASE() AS database, CURRENT_SCHEMA() AS schema;",
+        "detail": "Show Snowflake session context."
+      },
+      {
+        "label": "sf query history",
+        "insertText": "SELECT query_id, user_name, warehouse_name, execution_status, total_elapsed_time, bytes_scanned, rows_produced, query_text\nFROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY(END_TIME_RANGE_START => DATEADD('hour', -1, CURRENT_TIMESTAMP()), RESULT_LIMIT => 100))\nORDER BY start_time DESC;",
+        "detail": "Recent query history from INFORMATION_SCHEMA."
+      },
+      {
+        "label": "sf query profile",
+        "insertText": "SELECT *\nFROM TABLE(GET_QUERY_OPERATOR_STATS('<query_id>'))\nORDER BY step_id, operator_id;",
+        "detail": "Operator-level query profile for one query id."
+      },
+      {
+        "label": "sf copy validate",
+        "insertText": "COPY INTO <table_name>\nFROM @<stage_name>\nFILE_FORMAT = (FORMAT_NAME = '<file_format>')\nVALIDATION_MODE = RETURN_ERRORS;",
+        "detail": "Validate staged files before loading."
+      },
+      {
+        "label": "sf cortex complete",
+        "insertText": "SELECT SNOWFLAKE.CORTEX.COMPLETE('claude-3-5-sonnet', '<prompt>') AS response;",
+        "detail": "Run a Cortex AISQL completion."
+      }
+    ],
+    "formatter": {
+      "keywordCase": "upper",
+      "identifierQuote": "\"",
+      "provider": "sql-dialect-fmt",
+      "command": "sql_format_snowflake",
+      "lineWidth": 100,
+      "indentWidth": 4
+    }
+  },
+  "experience": {
+    "schemaVersion": 1,
+    "domains": [
+      "warehouse"
+    ],
+    "inspiredBy": [
+      "Snowsight Worksheets",
+      "Snowsight Query History",
+      "Snowsight Query Profile",
+      "Snowflake SQL API",
+      "Snowflake Tasks",
+      "Snowflake Streams",
+      "Snowflake Dynamic Tables",
+      "Snowflake Semantic Views",
+      "Snowflake Cortex AISQL",
+      "sql-dialect-fmt"
+    ],
+    "resultViews": [
+      "worksheet",
+      "queryHistory",
+      "queryProfile",
+      "warehouseMonitor",
+      "costChart",
+      "copyReport",
+      "taskGraph",
+      "lineage",
+      "semanticModel",
+      "notebook",
+      "aiAssistant",
+      "table"
+    ],
+    "objectTypes": [
+      "accounts",
+      "databases",
+      "schemas",
+      "tables",
+      "views",
+      "semanticViews",
+      "stages",
+      "fileFormats",
+      "warehouses",
+      "roles",
+      "users",
+      "shares",
+      "tasks",
+      "streams",
+      "dynamicTables",
+      "notebooks",
+      "queryHistory",
+      "queryProfile",
+      "cortexFunctions"
+    ],
+    "workflows": [
+      {
+        "id": "snowflake-worksheet-context",
+        "label": "Worksheet context",
+        "description": "Show account, role, warehouse, database, schema, and formatter-backed worksheet context.",
+        "resultView": "worksheet",
+        "templateIds": [
+          "snowflake-context"
+        ]
+      },
+      {
+        "id": "snowflake-query-history",
+        "label": "Query history triage",
+        "description": "Find slow, failed, expensive, or high-scan queries without leaving the connector.",
+        "resultView": "queryHistory",
+        "templateIds": [
+          "snowflake-query-history",
+          "snowflake-expensive-queries",
+          "snowflake-result-scan"
+        ]
+      },
+      {
+        "id": "snowflake-query-profile",
+        "label": "Query profile drilldown",
+        "description": "Open operator stats for a query id and compare hotspots.",
+        "resultView": "queryProfile",
+        "templateIds": [
+          "snowflake-query-profile"
+        ]
+      },
+      {
+        "id": "snowflake-warehouse-monitor",
+        "label": "Warehouse monitor",
+        "description": "Inspect warehouse load and credit consumption together.",
+        "resultView": "warehouseMonitor",
+        "templateIds": [
+          "snowflake-warehouse-load",
+          "snowflake-warehouse-metering"
+        ]
+      },
+      {
+        "id": "snowflake-data-loading",
+        "label": "Stage and COPY control",
+        "description": "Validate staged files, load them, and review load failures.",
+        "resultView": "copyReport",
+        "templateIds": [
+          "snowflake-copy-validate",
+          "snowflake-copy-into",
+          "snowflake-load-history"
+        ]
+      },
+      {
+        "id": "snowflake-data-engineering",
+        "label": "Streams, tasks, and dynamic tables",
+        "description": "Create incremental pipelines with streams, tasks, and dynamic tables.",
+        "resultView": "taskGraph",
+        "templateIds": [
+          "snowflake-stream-changes",
+          "snowflake-create-task",
+          "snowflake-dynamic-table"
+        ]
+      },
+      {
+        "id": "snowflake-semantic-layer",
+        "label": "Semantic model starter",
+        "description": "Start a semantic view and inspect metrics-friendly model shape.",
+        "resultView": "semanticModel",
+        "templateIds": [
+          "snowflake-semantic-view"
+        ]
+      },
+      {
+        "id": "snowflake-cortex-ai",
+        "label": "Cortex AISQL assistant",
+        "description": "Use Cortex functions from SQL templates for summarization and generation.",
+        "resultView": "aiAssistant",
+        "templateIds": [
+          "snowflake-cortex-complete",
+          "snowflake-cortex-summarize"
+        ]
+      },
+      {
+        "id": "snowflake-governance",
+        "label": "Role and grants audit",
+        "description": "Inspect active role, grants, and object access before running privileged operations.",
+        "resultView": "table",
+        "templateIds": [
+          "snowflake-role-grants"
+        ]
+      }
+    ],
+    "queryTemplates": [
+      {
+        "id": "snowflake-context",
+        "label": "Current Snowflake context",
+        "language": "sql",
+        "description": "Show the account, user, role, warehouse, database, and schema used by this worksheet.",
+        "insertText": "SELECT\n  CURRENT_ACCOUNT() AS account,\n  CURRENT_REGION() AS region,\n  CURRENT_USER() AS user_name,\n  CURRENT_ROLE() AS role_name,\n  CURRENT_WAREHOUSE() AS warehouse_name,\n  CURRENT_DATABASE() AS database_name,\n  CURRENT_SCHEMA() AS schema_name;",
+        "parameters": [],
+        "resultView": "worksheet"
+      },
+      {
+        "id": "snowflake-query-history",
+        "label": "Recent query history",
+        "language": "sql",
+        "description": "List recent query history from INFORMATION_SCHEMA with runtime and scan indicators.",
+        "insertText": "SELECT\n  query_id,\n  user_name,\n  warehouse_name,\n  execution_status,\n  total_elapsed_time,\n  bytes_scanned,\n  rows_produced,\n  query_text\nFROM TABLE(\n  INFORMATION_SCHEMA.QUERY_HISTORY(\n    END_TIME_RANGE_START => DATEADD('hour', -$hours, CURRENT_TIMESTAMP()),\n    RESULT_LIMIT => $limit\n  )\n)\nORDER BY start_time DESC;",
+        "parameters": [
+          {
+            "id": "hours",
+            "label": "Hours back",
+            "type": "number",
+            "default": 1
+          },
+          {
+            "id": "limit",
+            "label": "Limit",
+            "type": "number",
+            "default": 100
+          }
+        ],
+        "resultView": "queryHistory"
+      },
+      {
+        "id": "snowflake-expensive-queries",
+        "label": "Expensive queries",
+        "language": "sql",
+        "description": "Find high-scan or long-running queries from ACCOUNT_USAGE.",
+        "insertText": "SELECT\n  query_id,\n  user_name,\n  warehouse_name,\n  total_elapsed_time / 1000 AS elapsed_seconds,\n  bytes_scanned,\n  rows_produced,\n  credits_used_cloud_services,\n  query_text\nFROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY\nWHERE start_time >= DATEADD('hour', -$hours, CURRENT_TIMESTAMP())\nORDER BY bytes_scanned DESC, total_elapsed_time DESC\nLIMIT $limit;",
+        "parameters": [
+          {
+            "id": "hours",
+            "label": "Hours back",
+            "type": "number",
+            "default": 24
+          },
+          {
+            "id": "limit",
+            "label": "Limit",
+            "type": "number",
+            "default": 50
+          }
+        ],
+        "resultView": "costChart"
+      },
+      {
+        "id": "snowflake-result-scan",
+        "label": "Result scan",
+        "language": "sql",
+        "description": "Re-open a prior query result by query id.",
+        "insertText": "SELECT *\nFROM TABLE(RESULT_SCAN('$queryId'))\nLIMIT $limit;",
+        "parameters": [
+          {
+            "id": "queryId",
+            "label": "Query ID",
+            "type": "string"
+          },
+          {
+            "id": "limit",
+            "label": "Limit",
+            "type": "number",
+            "default": 100
+          }
+        ],
+        "resultView": "table"
+      },
+      {
+        "id": "snowflake-query-profile",
+        "label": "Query operator stats",
+        "language": "sql",
+        "description": "Inspect operator-level query profile data for a query id.",
+        "insertText": "SELECT *\nFROM TABLE(GET_QUERY_OPERATOR_STATS('$queryId'))\nORDER BY step_id, operator_id;",
+        "parameters": [
+          {
+            "id": "queryId",
+            "label": "Query ID",
+            "type": "string"
+          }
+        ],
+        "resultView": "queryProfile"
+      },
+      {
+        "id": "snowflake-warehouse-load",
+        "label": "Warehouse load history",
+        "language": "sql",
+        "description": "Review queued and running load for one warehouse.",
+        "insertText": "SELECT *\nFROM TABLE(\n  INFORMATION_SCHEMA.WAREHOUSE_LOAD_HISTORY(\n    DATE_RANGE_START => DATEADD('hour', -$hours, CURRENT_TIMESTAMP()),\n    WAREHOUSE_NAME => '$warehouse'\n  )\n)\nORDER BY start_time DESC;",
+        "parameters": [
+          {
+            "id": "hours",
+            "label": "Hours back",
+            "type": "number",
+            "default": 6
+          },
+          {
+            "id": "warehouse",
+            "label": "Warehouse",
+            "type": "string"
+          }
+        ],
+        "resultView": "warehouseMonitor"
+      },
+      {
+        "id": "snowflake-warehouse-metering",
+        "label": "Warehouse metering history",
+        "language": "sql",
+        "description": "Review credits used by a warehouse.",
+        "insertText": "SELECT\n  start_time,\n  end_time,\n  warehouse_name,\n  credits_used,\n  credits_used_compute,\n  credits_used_cloud_services\nFROM TABLE(\n  INFORMATION_SCHEMA.WAREHOUSE_METERING_HISTORY(\n    DATE_RANGE_START => DATEADD('day', -$days, CURRENT_TIMESTAMP()),\n    WAREHOUSE_NAME => '$warehouse'\n  )\n)\nORDER BY start_time DESC;",
+        "parameters": [
+          {
+            "id": "days",
+            "label": "Days back",
+            "type": "number",
+            "default": 7
+          },
+          {
+            "id": "warehouse",
+            "label": "Warehouse",
+            "type": "string"
+          }
+        ],
+        "resultView": "costChart"
+      },
+      {
+        "id": "snowflake-copy-validate",
+        "label": "Validate staged files",
+        "language": "sql",
+        "description": "Validate staged files before loading them into a table.",
+        "insertText": "COPY INTO $table\nFROM @$stage\nFILE_FORMAT = (FORMAT_NAME = '$fileFormat')\nVALIDATION_MODE = RETURN_ERRORS;",
+        "parameters": [
+          {
+            "id": "table",
+            "label": "Target table",
+            "type": "string"
+          },
+          {
+            "id": "stage",
+            "label": "Stage",
+            "type": "string"
+          },
+          {
+            "id": "fileFormat",
+            "label": "File format",
+            "type": "string"
+          }
+        ],
+        "resultView": "copyReport"
+      },
+      {
+        "id": "snowflake-copy-into",
+        "label": "COPY INTO table",
+        "language": "sql",
+        "description": "Load staged files into a target table.",
+        "insertText": "COPY INTO $table\nFROM @$stage\nFILE_FORMAT = (FORMAT_NAME = '$fileFormat')\nMATCH_BY_COLUMN_NAME = CASE_INSENSITIVE\nON_ERROR = CONTINUE;",
+        "parameters": [
+          {
+            "id": "table",
+            "label": "Target table",
+            "type": "string"
+          },
+          {
+            "id": "stage",
+            "label": "Stage",
+            "type": "string"
+          },
+          {
+            "id": "fileFormat",
+            "label": "File format",
+            "type": "string"
+          }
+        ],
+        "resultView": "copyReport"
+      },
+      {
+        "id": "snowflake-load-history",
+        "label": "Load history",
+        "language": "sql",
+        "description": "Inspect load status for a target table.",
+        "insertText": "SELECT *\nFROM TABLE(\n  INFORMATION_SCHEMA.LOAD_HISTORY(\n    TABLE_NAME => '$table',\n    START_TIME => DATEADD('day', -$days, CURRENT_TIMESTAMP())\n  )\n)\nORDER BY last_load_time DESC;",
+        "parameters": [
+          {
+            "id": "table",
+            "label": "Table",
+            "type": "string"
+          },
+          {
+            "id": "days",
+            "label": "Days back",
+            "type": "number",
+            "default": 7
+          }
+        ],
+        "resultView": "copyReport"
+      },
+      {
+        "id": "snowflake-stream-changes",
+        "label": "Read stream changes",
+        "language": "sql",
+        "description": "Preview change data captured by a stream.",
+        "insertText": "SELECT *\nFROM $streamName\nWHERE METADATA$ACTION IS NOT NULL\nLIMIT $limit;",
+        "parameters": [
+          {
+            "id": "streamName",
+            "label": "Stream name",
+            "type": "string"
+          },
+          {
+            "id": "limit",
+            "label": "Limit",
+            "type": "number",
+            "default": 100
+          }
+        ],
+        "resultView": "lineage"
+      },
+      {
+        "id": "snowflake-create-task",
+        "label": "Create scheduled task",
+        "language": "sql",
+        "description": "Create a scheduled task starter using the active warehouse.",
+        "insertText": "CREATE OR REPLACE TASK $taskName\n  WAREHOUSE = $warehouse\n  SCHEDULE = 'USING CRON 0 * * * * UTC'\nAS\n  $statement;",
+        "parameters": [
+          {
+            "id": "taskName",
+            "label": "Task name",
+            "type": "string"
+          },
+          {
+            "id": "warehouse",
+            "label": "Warehouse",
+            "type": "string"
+          },
+          {
+            "id": "statement",
+            "label": "Task SQL",
+            "type": "string",
+            "default": "SELECT 1"
+          }
+        ],
+        "resultView": "taskGraph"
+      },
+      {
+        "id": "snowflake-dynamic-table",
+        "label": "Create dynamic table",
+        "language": "sql",
+        "description": "Create a dynamic table with a target lag and warehouse.",
+        "insertText": "CREATE OR REPLACE DYNAMIC TABLE $dynamicTable\n  TARGET_LAG = '$targetLag'\n  WAREHOUSE = $warehouse\nAS\nSELECT *\nFROM $sourceTable;",
+        "parameters": [
+          {
+            "id": "dynamicTable",
+            "label": "Dynamic table",
+            "type": "string"
+          },
+          {
+            "id": "targetLag",
+            "label": "Target lag",
+            "type": "string",
+            "default": "5 minutes"
+          },
+          {
+            "id": "warehouse",
+            "label": "Warehouse",
+            "type": "string"
+          },
+          {
+            "id": "sourceTable",
+            "label": "Source table",
+            "type": "string"
+          }
+        ],
+        "resultView": "lineage"
+      },
+      {
+        "id": "snowflake-semantic-view",
+        "label": "Semantic view starter",
+        "language": "sql",
+        "description": "Start a semantic view definition for metric-friendly analytics.",
+        "insertText": "CREATE OR REPLACE SEMANTIC VIEW $semanticView\n  TABLES (\n    $factTable PRIMARY KEY ($primaryKey)\n  )\n  FACTS (\n    $factTable.$metricColumn AS metric_value\n  )\n  METRICS (\n    metric_count AS COUNT(*)\n  );",
+        "parameters": [
+          {
+            "id": "semanticView",
+            "label": "Semantic view",
+            "type": "string"
+          },
+          {
+            "id": "factTable",
+            "label": "Fact table",
+            "type": "string"
+          },
+          {
+            "id": "primaryKey",
+            "label": "Primary key",
+            "type": "string"
+          },
+          {
+            "id": "metricColumn",
+            "label": "Metric column",
+            "type": "string"
+          }
+        ],
+        "resultView": "semanticModel"
+      },
+      {
+        "id": "snowflake-cortex-complete",
+        "label": "Cortex complete",
+        "language": "sql",
+        "description": "Generate text with a Cortex model.",
+        "insertText": "SELECT SNOWFLAKE.CORTEX.COMPLETE('$model', '$prompt') AS response;",
+        "parameters": [
+          {
+            "id": "model",
+            "label": "Model",
+            "type": "string",
+            "default": "claude-3-5-sonnet"
+          },
+          {
+            "id": "prompt",
+            "label": "Prompt",
+            "type": "string"
+          }
+        ],
+        "resultView": "aiAssistant"
+      },
+      {
+        "id": "snowflake-cortex-summarize",
+        "label": "Cortex summarize",
+        "language": "sql",
+        "description": "Summarize a column or text expression with Cortex.",
+        "insertText": "SELECT SNOWFLAKE.CORTEX.SUMMARIZE($expression) AS summary\nFROM $table\nLIMIT $limit;",
+        "parameters": [
+          {
+            "id": "expression",
+            "label": "Expression",
+            "type": "string"
+          },
+          {
+            "id": "table",
+            "label": "Table",
+            "type": "string"
+          },
+          {
+            "id": "limit",
+            "label": "Limit",
+            "type": "number",
+            "default": 25
+          }
+        ],
+        "resultView": "aiAssistant"
+      },
+      {
+        "id": "snowflake-role-grants",
+        "label": "Role grants",
+        "language": "sql",
+        "description": "Inspect grants for a role before changing objects.",
+        "insertText": "SHOW GRANTS TO ROLE $role;",
+        "parameters": [
+          {
+            "id": "role",
+            "label": "Role",
+            "type": "string"
+          }
+        ],
+        "resultView": "table"
+      }
+    ],
+    "inspectorHints": [
+      {
+        "id": "snowflake-session-context",
+        "label": "Session context",
+        "description": "Pin role, warehouse, database, and schema above the worksheet."
+      },
+      {
+        "id": "snowflake-format-provider",
+        "label": "Snowflake formatter",
+        "description": "Use sql-dialect-fmt for lossless Snowflake formatting before falling back to generic SQL formatting."
+      },
+      {
+        "id": "snowflake-query-profile",
+        "label": "Profile deep link",
+        "description": "Attach query ids to results so operator stats can open beside the grid."
+      },
+      {
+        "id": "snowflake-warehouse-cost",
+        "label": "Warehouse cost panel",
+        "description": "Pair load history with metering history and current warehouse size."
+      },
+      {
+        "id": "snowflake-pipeline-objects",
+        "label": "Pipeline objects",
+        "description": "Group streams, tasks, and dynamic tables as a pipeline graph."
+      },
+      {
+        "id": "snowflake-cortex",
+        "label": "Cortex actions",
+        "description": "Expose AI SQL templates only when the active account has Cortex access."
+      }
+    ]
+  },
+  "manifest": {
+    "extraPermissions": [
+      "sqlDialects"
+    ],
+    "extraDevWatch": [
+      "dialects"
+    ],
+    "sqlDialects": [
+      {
+        "id": "snowflake.sql",
+        "name": "Snowflake SQL",
+        "path": "dialects/snowflake.json",
+        "fileExtensions": [
+          ".sql",
+          ".sfsql"
+        ]
+      }
+    ]
+  }
+}
