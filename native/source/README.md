@@ -6,8 +6,10 @@ Source SHA-256: `cb9c693f090832d6d91b4dca176495e446ff7b436247d71692539e27f6493a5
 
 
 This directory is a migration staging area for `irodori.snowflake`. The active native
-ABI shim lives in `src/lib.rs`; engine-specific connect/query/metadata behavior
-should move here as the connector runtime contract is wired into the desktop app.
+entrypoints live in `src/lib.rs`, shared ABI helpers live in `src/abi.rs`, and
+engine behavior lives in `src/stub.rs` or `src/driver.rs`. Engine-specific
+connect/query/metadata code should move from these snapshots into that behavior
+module as the connector runtime contract is wired into the desktop app.
 
 ## Migration Snapshots
 
